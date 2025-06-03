@@ -420,10 +420,10 @@ footer span {
 }
 
 .currency-logo img {
-    width: 50px;
-    height: 50px;
+    width: 80px;
+    height: 80px;
     border-radius: 50%;
     background-color: #d25354;
-    padding: 8px;
+    padding: 0px;
     box-sizing: border-box;
 }
