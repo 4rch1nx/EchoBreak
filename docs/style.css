@@ -394,6 +394,7 @@ footer span {
     max-width: 500px;
     margin: 0 auto;
     border: 2px solid #d25354;
+    margin-bottom: 10px;
 }
 
 .crypto-card-body {
