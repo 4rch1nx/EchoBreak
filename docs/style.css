@@ -385,3 +385,45 @@ footer span {
     background-color: #fff; /* White color */
     margin: 10px 0; /* Add spacing above and below the line */
 }
+
+/* Crypto Card Styles */
+.crypto-card {
+    background-color: #3b3b3b;
+    border-radius: 20px;
+    padding: 20px;
+    max-width: 500px;
+    margin: 0 auto;
+    border: 2px solid #d25354;
+}
+
+.crypto-card-body {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.balance {
+    text-align: left;
+}
+
+.amount {
+    font-size: 20px;
+    font-weight: bold;
+    color: #fff;
+    margin-top: 5px;
+}
+
+.amount-rub {
+    font-size: 14px;
+    color: #ccc;
+    margin-top: 5px;
+}
+
+.currency-logo img {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background-color: #d25354;
+    padding: 8px;
+    box-sizing: border-box;
+}
