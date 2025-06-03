@@ -9,7 +9,6 @@
 </head>
 <body>
 
-    <!-- Header -->
     <header>
         <a href="index.html" id="logo-link">
             <img src="images/logo.png" alt="EchoBreak Logo" class="logo">
@@ -26,16 +25,26 @@
         </nav>
     </header>
 
-    <!-- Separator Line -->
     <div class="separator"></div>
 
-    <!-- Main Content -->
     <main>
         <h1>EchoBreak</h1>
         <h2>Крипта</h2>
         <h3>For educational purposes only!</h3>
+
         <div id="xmr-stats">
-            <p>Загрузка данных...</p>
+            <div class="crypto-card">
+                <div class="crypto-card-body">
+                    <div class="balance">
+                        <span>Баланс:</span>
+                        <div class="amount" id="xmr-amount">Загрузка...</div>
+                        <div class="amount-rub" id="rub-amount"></div>
+                    </div>
+                    <div class="currency-logo">
+                        <img src="images/monero-logo.png" alt="Monero Logo">
+                    </div>
+                </div>
+            </div>
         </div>
     </main>
 
@@ -44,16 +53,14 @@
         <p>EchoBreak, 2025</p>
     </footer>
 
-    <!-- JavaScript to Fetch and Display Data -->
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            const xmrStatsDiv = document.getElementById('xmr-stats');
+            const xmrAmount = document.getElementById('xmr-amount');
+            const rubAmount = document.getElementById('rub-amount');
 
-            // Replace with your Monero wallet address
             const WALLET_ADDRESS = '42u3Aeoqq53Y8bKGT7RdawhtcS9AqYuKEDwwYL4BiS5s34964uaJU2zWB7miadNEBWCjcMXtMjcsa6boEZmpaeTV4ESEqpU';
 
-            // Fetch data from MoneroOcean API
-            fetch(`https://api.moneroocean.stream/miner/${WALLET_ADDRESS}/stats`)
+            fetch(`https://api.moneroocean.stream/miner/${WALLET_ADDRESS}/stats`) 
                 .then(response => {
                     if (!response.ok) {
                         throw new Error('Network response was not ok');
@@ -61,38 +68,25 @@
                     return response.json();
                 })
                 .then(data => {
-                    // Extract totalDue and amtPaid from the API response
-                    const totalDue = parseFloat(data.amtDue / 1000000000000 || 0).toFixed(6); // Format to 6 decimal places
-                    const amtPaid = parseFloat(data.amtPaid / 1000000000000 || 0).toFixed(6); // Format to 6 decimal places
+                    const totalDue = parseFloat(data.amtDue / 1000000000000 || 0).toFixed(6);
 
-                    // Fetch XMR price in RUB from CoinGecko API
                     return fetch('https://api.coingecko.com/api/v3/simple/price?ids=monero&vs_currencies=rub')
-                        .then(response => {
-                            if (!response.ok) {
-                                throw new Error('Failed to fetch XMR price');
-                            }
-                            return response.json();
+                        .then(res => {
+                            if (!res.ok) throw new Error('Failed to fetch price');
+                            return res.json();
                         })
                         .then(priceData => {
-                            const xmrPriceInRub = priceData.monero.rub;
+                            const xmrPriceRub = priceData.monero.rub;
+                            const rubValue = (parseFloat(totalDue) * xmrPriceRub).toFixed(2);
 
-                            // Convert totalDue and amtPaid to RUB
-                            const totalDueRub = (parseFloat(totalDue) * xmrPriceInRub).toFixed(2);
-                            const amtPaidRub = (parseFloat(amtPaid) * xmrPriceInRub).toFixed(2);
-
-                            // Display both values in the stats section
-                            xmrStatsDiv.innerHTML = `
-                                <p>Общая сумма XMR к выплате: <strong>${totalDue} XMR (${totalDueRub} ₽)</strong></p>
-                                <p>Общая сумма XMR выплачено: <strong>${amtPaid} XMR (${amtPaidRub} ₽)</strong></p>
-                                <h3>INFO</h3>
-                                <p>Минимальная сумма XMR к выплате: <strong>0.003 XMR</strong></p>
-                                <p>Общая сумма XMR выплачено - <strong>сумма на нашем счету</strong></p>
-                            `;
+                            xmrAmount.textContent = `${totalDue} XMR`;
+                            rubAmount.textContent = `${rubValue} ₽`;
                         });
                 })
                 .catch(error => {
                     console.error('Error fetching data:', error);
-                    xmrStatsDiv.innerHTML = '<p>Ошибка при загрузке данных.</p>';
+                    xmrAmount.textContent = '—';
+                    rubAmount.textContent = '—';
                 });
         });
     </script>
