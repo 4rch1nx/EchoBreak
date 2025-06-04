@@ -7,6 +7,7 @@
     <link rel="stylesheet" href="style.css" />
     <link rel="icon" type="image/png" href="images/favicon.png" />
 
+    <!-- Chart.js CDN -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script> 
 </head>
 <body>
@@ -49,6 +50,7 @@
         </div>
     </div>
 
+    <!-- Chart Container -->
     <div class="chart-container" style="width: 90%; max-width: 600px; margin: 40px auto;">
         <canvas id="xmrRubChart"></canvas>
     </div>
@@ -97,13 +99,23 @@
                         const prices = chartData.prices.map(p => p[1]); // Extract price values
                         const timestamps = chartData.prices.map(p => p[0]); // Extract timestamps
 
+                        // Sample data to reduce the number of points
+                        const sampledPrices = [];
+                        const sampledTimestamps = [];
+                        const step = Math.ceil(timestamps.length / 30); // Show approximately 30 points
+
+                        for (let i = 0; i < timestamps.length; i += step) {
+                            sampledPrices.push(prices[i]);
+                            sampledTimestamps.push(timestamps[i]);
+                        }
+
                         // Convert timestamps to readable dates
-                        const labels = timestamps.map(timestamp => {
+                        const labels = sampledTimestamps.map(timestamp => {
                             const date = new Date(timestamp);
                             return date.toISOString().split('T')[0]; // Format as YYYY-MM-DD
                         });
 
-                        drawChart(labels, prices);
+                        drawChart(labels, sampledPrices);
                     })
                     .catch(chartError => {
                         console.warn("Failed to load real chart data:", chartError.message);
@@ -135,6 +147,12 @@
 
     function renderChart(labels, data) {
         const ctx = document.getElementById('xmrRubChart').getContext('2d');
+
+        // Determine line color based on trend
+        const firstPrice = data[0];
+        const lastPrice = data[data.length - 1];
+        const borderColor = lastPrice > firstPrice ? '#00ff00' : '#ff0000'; // Green for up, Red for down 
+
         new Chart(ctx, {
             type: 'line',
             data: {
@@ -142,7 +160,7 @@
                 datasets: [{
                     label: 'XMR to RUB (Last 30 Days)',
                     data: data,
-                    borderColor: '#d25354', 
+                    borderColor: borderColor,
                     backgroundColor: 'rgba(210, 83, 84, 0.1)',
                     tension: 0.3,
                     fill: true,
