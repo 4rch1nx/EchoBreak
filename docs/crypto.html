@@ -65,6 +65,7 @@
 
         const WALLET_ADDRESS = '42u3Aeoqq53Y8bKGT7RdawhtcS9AqYuKEDwwYL4BiS5s34964uaJU2zWB7miadNEBWCjcMXtMjcsa6boEZmpaeTV4ESEqpU';
 
+        // Fetch wallet stats
         fetch(`https://api.moneroocean.stream/miner/${WALLET_ADDRESS}/stats`) 
             .then(response => {
                 if (!response.ok) throw new Error('Wallet fetch error');
@@ -73,6 +74,7 @@
             .then(data => {
                 const totalDue = parseFloat(data.amtPaid / 1000000000000 || 0).toFixed(6);
 
+                // Fetch current price
                 return fetch('https://api.coingecko.com/api/v3/simple/price?ids=monero&vs_currencies=rub')
                     .then(res => {
                         if (!res.ok) throw new Error('Price fetch error');
@@ -84,6 +86,7 @@
                         xmrAmount.textContent = `${totalDue} XMR`;
                         rubAmount.textContent = `${rubValue} ₽`;
 
+                        // Now fetch historical data for the chart
                         return fetch('https://api.coingecko.com/api/v3/coins/monero/market_chart?vs_currency=rub&days=30')
                             .then(res => {
                                 if (!res.ok) throw new Error('Historical fetch error');
@@ -91,8 +94,16 @@
                             });
                     })
                     .then(chartData => {
-                        const prices = chartData.prices.map(p => p[1]);
-                        drawChart(prices);
+                        const prices = chartData.prices.map(p => p[1]); // Extract price values
+                        const timestamps = chartData.prices.map(p => p[0]); // Extract timestamps
+
+                        // Convert timestamps to readable dates
+                        const labels = timestamps.map(timestamp => {
+                            const date = new Date(timestamp);
+                            return date.toISOString().split('T')[0]; // Format as YYYY-MM-DD
+                        });
+
+                        drawChart(labels, prices);
                     })
                     .catch(chartError => {
                         console.warn("Failed to load real chart data:", chartError.message);
@@ -107,13 +118,13 @@
             });
     });
 
-    function drawChart(data) {
-        const labels = Array.from({length: data.length}, (_, i) => `Day ${i + 1}`);
+    function drawChart(labels, data) {
+        const ctx = document.getElementById('xmrRubChart').getContext('2d');
         renderChart(labels, data);
     }
 
     function drawFallbackChart() {
-        const days = Array.from({length: 30}, (_, i) => `Day ${i + 1}`);
+        const days = Array.from({ length: 30 }, (_, i) => `Day ${i + 1}`);
         const xmrToRubData = [
             2800, 2850, 2830, 2780, 2810, 2890, 2900, 2950, 3000, 3020,
             3010, 3030, 3050, 3070, 3100, 3120, 3110, 3130, 3150, 3170,
@@ -150,7 +161,11 @@
                     },
                     x: {
                         ticks: {
-                            color: '#fff'
+                            color: '#fff',
+                            callback: function (value, index, values) {
+                                // Show only every 5th label to avoid overcrowding
+                                return index % 5 === 0 ? value : '';
+                            }
                         }
                     }
                 },
