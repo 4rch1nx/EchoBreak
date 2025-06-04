@@ -36,21 +36,9 @@
             <div class="crypto-card">
                 <div class="crypto-card-body">
                     <div class="balance">
-                        <span>К выплате:</span>
+                        <span>Выплачено:</span>
                         <div class="amount" id="xmr-amount">Загрузка...</div>
                         <div class="amount-rub" id="rub-amount"></div>
-                    </div>
-                    <div class="currency-logo">
-                        <img src="images/monero-logo.png" alt="Monero Logo">
-                    </div>
-                </div>
-            </div>
-            <div class="crypto-card">
-                <div class="crypto-card-body">
-                    <div class="balance">
-                        <span>Баланс:</span>
-                        <div class="amount" id="xmr-paid">Загрузка...</div>
-                        <div class="amount-rub" id="rub-paid"></div>
                     </div>
                     <div class="currency-logo">
                         <img src="images/monero-logo.png" alt="Monero Logo">
@@ -75,12 +63,12 @@
             fetch(`https://api.moneroocean.stream/miner/${WALLET_ADDRESS}/stats`) 
                 .then(response => {
                     if (!response.ok) {
-                        throw new Error('Network response was not ok');
+                        throw new Error('Network response error');
                     }
                     return response.json();
                 })
                 .then(data => {
-                    const totalDue = parseFloat(data.amtDue / 1000000000000 || 0).toFixed(6);
+                    const totalDue = parseFloat(data.amtPaid / 1000000000000 || 0).toFixed(6);
 
                     return fetch('https://api.coingecko.com/api/v3/simple/price?ids=monero&vs_currencies=rub')
                         .then(res => {
