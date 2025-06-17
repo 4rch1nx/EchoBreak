@@ -1,5 +1,4 @@
 import subprocess
-import ipaddress
 import paramiko
 from tqdm import tqdm
 import time
