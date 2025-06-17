@@ -27,8 +27,10 @@ void Worker_utils::install(std::string user_name)
 void Worker_utils::receive(std::vector<std::string> &messages)
 {
     ssize_t bytes_received = recvfrom(m_rec_sock, m_buffer, BUFFER_SIZE, 0, (struct sockaddr *)&m_rec_broadcast_addr, &m_rec_addr_len);
-    messages = split((std::string)m_buffer);
-    memset(m_buffer, 0, sizeof(m_buffer));
+    if(bytes_received > 0){
+        messages = split((std::string)m_buffer);
+        memset(m_buffer, 0, sizeof(m_buffer));
+    }
 }
 
 void Worker_utils::send(std::string data)
@@ -43,6 +45,9 @@ void Worker_utils::send(std::string data)
 
 void Worker_utils::init()
 {
+    
+    m_broadcast_ip = getBroadCastAddress();
+
     // For sending
     if ((m_send_sock = socket(AF_INET, SOCK_DGRAM, 0)) < 0)
     {

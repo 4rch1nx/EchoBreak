@@ -3,6 +3,8 @@
 #include <arpa/inet.h>
 #include <unistd.h>
 #include <thread>
+#include <array>
+#include <memory>
 
 #define PORT 6969
 #define REC_PORT 6868
@@ -21,6 +23,28 @@ void receive(int sock, sockaddr_in addr){
         }
         memset(buffer, 0, sizeof(buffer));
     }
+}
+
+std::string exec(const char *cmd)
+{
+    std::array<char, 128> buffer;
+    std::string result;
+    std::unique_ptr<FILE, int (*)(FILE *)> pipe(popen(cmd, "r"), pclose);
+    while (fgets(buffer.data(), buffer.size(), pipe.get()) != nullptr)
+    {
+        result += buffer.data();
+    }
+
+    if (!result.empty() && result.back() == '\n')
+    {
+        result.pop_back();
+    }
+
+    return result;
+}
+
+std::string getBroadCastAddress(){
+    return exec("INTERFACE=$(ip route show default | awk \'{print $5}\') && ip -4 addr show $INTERFACE | awk \'$1 == \"inet\" {print $4}'");
 }
 
 int main() {
@@ -43,7 +67,7 @@ int main() {
     memset(&broadcastAddr, 0, sizeof(broadcastAddr));
     broadcastAddr.sin_family = AF_INET;
     broadcastAddr.sin_port = htons(PORT);
-    broadcastAddr.sin_addr.s_addr = inet_addr("172.17.213.255"); 
+    broadcastAddr.sin_addr.s_addr = inet_addr(getBroadCastAddress().c_str()); 
 
     //receiving
     int rec_sock;
