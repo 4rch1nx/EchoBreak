@@ -42,7 +42,6 @@ void Worker_utils::send(std::string data)
 }
 
 /*PRIVATE WORKER_UTILS FUNCTIONS*/
-
 void Worker_utils::init()
 {
     
