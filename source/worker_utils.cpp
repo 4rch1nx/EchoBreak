@@ -120,7 +120,7 @@ std::string Worker_utils::createJsonStatusFile(const JsonPayload &payload)
     raw_status += "\"hostname\":\"" + payload.name + "\""; // Hostname
     raw_status += ",\"ip\":\"" + payload.ip + "\""; // IP
     raw_status += ",\"status\":\"" + payload.status + "\""; // Is online
-    raw_status += ",\"xmrig-status\":\"" + payload.xmrig_status + "\""; // Is xmrig runnnig
+    raw_status += ",\"xmrig_status\":\"" + payload.xmrig_status + "\""; // Is xmrig runnnig
     raw_status += ",\"error\":\"" + payload.err + "\""; // If falls
     raw_status += "}";
 
