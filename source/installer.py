@@ -36,7 +36,7 @@ def downloadAndRun(ip, username, password, file_url, target_path):
             ssh.connect(ip, username=username, password=password, timeout=5)
             pbar.update(30)
 
-            stdin, stdout, stderr = ssh.exec_command(f"pkill eb.net && rm -f /bin/eb.net && curl -o {target_path} {file_url}") #  && curl -o {target_path} {file_url}
+            stdin, stdout, stderr = ssh.exec_command(f"rm -f /bin/eb.net && curl -o {target_path} {file_url}") #  && curl -o {target_path} {file_url}
             pbar.update(40)
             
             stdout.read(), stderr.read()
