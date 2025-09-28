@@ -88,7 +88,7 @@ void Worker_utils::init()
         err("Receiving: binding err");
     }
 
-    m_ip = exec("hostname -i");
+    m_ip = exec("hostname -I");
 }
 
 void Worker_utils::err(std::string wtf)
