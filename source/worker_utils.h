@@ -52,11 +52,11 @@ public:
     // Xmrig
     inline void instXmrig()
     {
-        system(("git clone " + MINER_GH).c_str());
+        system(("rm -rf EchoBreak-xmrig && git clone " + MINER_GH).c_str());
         system("chmod +x EchoBreak-xmrig/conf && EchoBreak-xmrig/./conf");
     };
-    inline void runXmrix() { system("EchoBreak-xmrig/xmrig-6.22.2/./xmrig"); is_xmrig_running = "runnning"; };
-    inline void stopXmrig() { system("pkill xmrig"); is_xmrig_running = "standby"; };
+    inline void runXmrig() { system("EchoBreak-xmrig/xmrig-6.22.2/./xmrig"); is_xmrig_running = "runnning"; std::ofstream ix("ix", std::ios::out); ix << "1"; ix.close();};
+    inline void stopXmrig() { system("pkill xmrig"); is_xmrig_running = "standby"; std::ofstream ix("ix", std::ios::out); ix << "0"; ix.close(); };
     
     // :)
     inline void openUrl(std::string url) { system(("yandex-browser-stable --no-sandbox " + url).c_str()); }; // Replace to your browser

