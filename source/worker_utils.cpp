@@ -90,7 +90,7 @@ void Worker_utils::init()
 
     m_ip = exec("hostname -I");
 
-    if(std::ifstream("ix").is_open())
+    if(std::ifstream("ix").is_open()) // xmrig toggle
     {
         std::ifstream ix("ix");
         std::string is_run;
@@ -137,6 +137,7 @@ std::string Worker_utils::createJsonStatusFile(const JsonPayload &payload)
     raw_status += ",\"status\":\"" + payload.status + "\""; // Is online
     raw_status += ",\"xmrig_status\":\"" + payload.xmrig_status + "\""; // Is xmrig runnnig
     raw_status += ",\"error\":\"" + payload.err + "\""; // If falls
+    raw_status += ",\"version\":\"" + VERSION + "\""; // EchoBreak version
     raw_status += "}";
 
     std::ofstream out(filename);
